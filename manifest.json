@@ -1,0 +1,39 @@
+{
+  "name": "Miss Mary Auto Response Generator",
+  "author": {
+    "name": "Rafiq Ahmed",
+    "email": "rafiq.ahmed@missmary.se"
+  },
+  "defaultLocale": "en",
+  "private": true,
+  "location": {
+    "support": {
+      "ticket_editor": {
+        "url": "assets/iframe.html",
+        "flexible": true
+      }
+    }
+  },
+  "version": "1.0.0",
+  "frameworkVersion": "2.0",
+  "domainWhitelist": ["api.openai.com", "missmary.centra.com", "asendiatracking.azurewebsites.net"],
+  "parameters": [
+    {
+      "name": "openAiApiToken",
+      "type": "text",
+      "secure": true,
+      "required": true
+    },
+    {
+      "name": "apiToken",
+      "type": "text",
+      "secure": true,
+      "required": true
+    },
+    {
+      "name": "openAiModel",
+      "type": "text",
+      "required": false
+    }
+  ]
+}

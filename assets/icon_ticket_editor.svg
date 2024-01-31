@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <symbol id="default" viewBox="0 0 18 18">
+      <circle cx="9" cy="9" r="5"/>
+    </symbol>
+
+    <symbol id="mySymbol" viewBox="0 0 18 18">
+      <circle cx="3" cy="3" r="2"/>
+      <circle cx="9" cy="9" r="2"/>
+      <circle cx="15" cy="15" r="2"/>
+    </symbol>
+</svg>

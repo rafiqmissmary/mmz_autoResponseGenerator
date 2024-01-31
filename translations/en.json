@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "Miss Mary Auto Response Generator",
+    "short_description": "Generate auto responses for your help desk.",
+    "long_description": "Generate auto response of ticket based on \n ticket convercation and last order",
+    "installation_instructions": "Simply click install.",
+    "parameters": {
+      "openAiApiToken" : {
+        "label": "OpenAI API key"
+      },
+      "apiToken" : {
+        "label": "Centra graphql API key"
+      }
+    }
+  }
+}
