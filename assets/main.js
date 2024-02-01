@@ -1,7 +1,7 @@
 const client = ZAFClient.init();
-let openAiModel = 'gpt-4-turbo-preview'
+let openAiModel;
 client.metadata().then(function(metadata) {
-  openAiModel = metadata.settings.openAiModel;
+  openAiModel = metadata?.settings?.openAiModel !== null ? metadata?.settings?.openAiModel : 'gpt-4-turbo-preview'
 });
 
 const pathMap = {
@@ -10,7 +10,18 @@ const pathMap = {
   A: 'https://asendiatracking.azurewebsites.net/api/asendiafull?code=bPjsoAjRnInqcqbd2IAZpSAmLTA2lMO-Xm7D9M4Tc-RkAzFuFeaSiA%3D%3D&tracking='
 };
 const shippingTime = {
-  SE:'Orders usually takes 5-7 working days to arrive'
+  SE:'Orders usually takes 5-7 working days to arrive.',
+  AU: 'Orders usually takes 12-20 working days to arrive.',
+  NZ: 'Orders usually takes 12-20 working days to arrive.',
+  CA: 'Orders usually takes 15-20 working days to arrive.',
+  DK: 'Orders usually takes 5-10 working days to arrive.',
+  DE: 'Orders usually takes 3-8 working days to arrive.',
+  ES: 'Orders usually takes 7-11 working days to arrive.',
+  GB: 'Orders usually takes 7-11 working days to arrive.',
+  FI: 'Orders usually takes 6-13 working days to arrive.',
+  FR: 'Orders usually takes 4-9 working days to arrive.',
+  NO: 'Orders usually takes 6-13 working days to arrive.',
+  US: 'Orders usually takes 8-15 working days to arrive.'
 }
 const trackingUrl = {
   FI: 'https://www.posti.fi/fi/seuranta#/lahetys/',
