@@ -36,6 +36,25 @@ const trackingUrl = {
   DEFAULT: 'https://tracking.asendia.com/tracking/',
   DHL: 'https://www.dhl.com/se-en/home/tracking.html?tracking-id='
 };
+const contactNumber = {
+    SE: '+4633222220',
+    NZ: '+6492806315',
+    DK: '+4589870625',
+    AT: '+43720881572',
+    IE: '+35319014611',
+    FI: '+358942419003',
+    GB: '+448000885708',
+    US: 'Toll Free 18009324286',
+    DE: 'Toll Free 08001833845',
+    MX: 'Toll Free 8008720467',
+    AU: 'Toll Free 1800425890',
+    CH: '+56225814871',
+    FR: '+33182880969',
+    PT: '+351308801818',
+    NL: '+31208087555',
+    ES: '+34518890925',
+    BE: '+3225880680'
+}
 
 const opt = {
     type: "GET",
@@ -73,14 +92,15 @@ async function getPrompt(convo, customerOrder, cc) {
     const name = await getUserName();
     return [
         { role: "user", content: `Context: Summarize the following customer service interaction with the customer. Suggest answer the customer's question: ${convo}` },
-        { role: "system", content: "Context: We do not have any physical stores but offer fit guarantee, helpful customer service by phone and you may shop at www.missmary.com. Try for 100 days" },
+        { role: "system", content: "Context: We do not have any physical stores but offer fit guarantee, helpful customer service by phone and you may shop at https://www.missmary.com. Try for 100 days" },
         { role: "system", content:`Context: `+ shippingTime[cc] ?? `Orders usually takes 7-9 working days to arrive`},
+        { role: "system", content:`Context: Contact Number for Miss Mary: `+ contactNumber[cc] ?? `+4633222220`},
         { role: "system", content: `Context: Your name is ${name}. You are a very friendly, empatheitc, 69 year old, female customer service agent  for a lingerie company named Miss Mary of Sweden which specialises in extra comfortable bras.` },
 
         { role: "system", content:`Context: You are answering/replying to the ticket. Start with a greeting message. The format should be as
                                                 Greeting CustomerName,
                                                 Answer the question with tracking info and delivery time.
-                                                Miss Mary of Sweden www.missmary.com` },
+                                                Miss Mary of Sweden` },
         { role: "system", content:"Answer the question in the same language as the question. if the question is relating to an order, try to find shipping information in the order data." },
         { role: "system", content: `Order data in JSON: ${customerOrder}` },
     ]
