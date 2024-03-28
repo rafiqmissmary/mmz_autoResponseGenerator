@@ -1,13 +1,16 @@
 const client = ZAFClient.init();
 let openAiModel;
-client.metadata().then(function(metadata) {
-  openAiModel = metadata?.settings?.openAiModel !== null ? metadata?.settings?.openAiModel : 'gpt-4-turbo-preview'
+
+client.metadata().then(metadata => {
+  openAiModel = metadata?.settings?.openAiModel || 'gpt-4-turbo-preview';
 });
 
+
+const BASE_URL = 'https://asendiatracking.azurewebsites.net/api/';
 const pathMap = {
-  U: 'https://asendiatracking.azurewebsites.net/api/postnordfull?code=tS1Hisghk0bmbjB38m1y816KH7PA0Qtt_rP99BtmG5LeAzFuF0VL9A%3D%3D&tracking=',
-  D: 'https://asendiatracking.azurewebsites.net/api/dhlfull?code=tzT61L0Yd0lqz9cwyHPElFbEfwXbpkNw_N0tGUzZqtC5AzFuBmCeQw%3D%3D&trackingNumber=',
-  A: 'https://asendiatracking.azurewebsites.net/api/asendiafull?code=bPjsoAjRnInqcqbd2IAZpSAmLTA2lMO-Xm7D9M4Tc-RkAzFuFeaSiA%3D%3D&tracking='
+  U: `${BASE_URL}postnordfull?code=tS1Hisghk0bmbjB38m1y816KH7PA0Qtt_rP99BtmG5LeAzFuF0VL9A%3D%3D&tracking=`,
+  D: `${BASE_URL}dhlfull?code=tzT61L0Yd0lqz9cwyHPElFbEfwXbpkNw_N0tGUzZqtC5AzFuBmCeQw%3D%3D&trackingNumber=`,
+  A: `${BASE_URL}asendiafull?code=bPjsoAjRnInqcqbd2IAZpSAmLTA2lMO-Xm7D9M4Tc-RkAzFuFeaSiA%3D%3D&tracking=`
 };
 const shippingTime = {
   SE:'Orders usually takes 5-7 working days to arrive.',
@@ -79,30 +82,56 @@ async function updateSummary(customerOrder, cc) {
   document.getElementById("btnPostReply").style.display = "block";
 }
 async function getTicketReply(){
-    const container = document.getElementById("container");
-    client.invoke('comment.appendText', container.innerText);
+    const reply = document.getElementById("reply");
+    let text = reply.innerText;
+    console.log(text, 'text before');
+    //text = text.replace(/<br>/g, '\n\n');
+    text = text.replace(/\n/g, '<br>');
+    console.log(text, 'text');
+    client.invoke('comment.appendHtml', text);
+    client.invoke('hide');
+    client.invoke('show');
+    /*document.getElementById('pbtn').addEventListener('click', function(){
+      document.getElementById('ember3295').style.display = 'block';
+    });*/
 }
 
 async function getTicketConvo() {
   const ticketConvo = await client.get("ticket.conversation");
-  return JSON.stringify(ticketConvo["ticket.conversation"]);
+  let array = ticketConvo["ticket.conversation"];
+  array = array.map(obj => {
+    // Remove 'attachments', 'channel' properties
+    const { attachments, channel, ...newObj } = obj;
+    // Remove 'avatar' property from 'author' object
+    if (newObj.author) {
+      const { avatar, ...newAuthor } = newObj.author;
+      newObj.author = newAuthor;
+    }
+    // Remove 'contentType' property from 'message' object and strip HTML tags from 'content'
+    if (newObj.message) {
+      const { contentType, ...newMessage } = newObj.message;
+      if (newMessage.content) {
+        newMessage.content = newMessage.content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\n/g, ' ');
+      }
+      newObj.message = newMessage;
+    }
+    return newObj;
+  });
+  console.log(array, 'array');
+  return JSON.stringify(array);
 }
 
 async function getPrompt(convo, customerOrder, cc) {
     const name = await getUserName();
     return [
-        { role: "user", content: `Context: Summarize the following customer service interaction with the customer. Suggest answer the customer's question: ${convo}` },
-        { role: "system", content: "Context: We do not have any physical stores but offer fit guarantee, helpful customer service by phone and you may shop at https://www.missmary.com. Try for 100 days" },
-        { role: "system", content:`Context: `+ shippingTime[cc] ?? `Orders usually takes 7-9 working days to arrive`},
-        { role: "system", content:`Context: Contact Number for Miss Mary: `+ contactNumber[cc] ?? `+4633222220`},
-        { role: "system", content: `Context: Your name is ${name}. You are a very friendly, empatheitc, 69 year old, female customer service agent  for a lingerie company named Miss Mary of Sweden which specialises in extra comfortable bras.` },
-
-        { role: "system", content:`Context: You are answering/replying to the ticket. Start with a greeting message. The format should be as
-                                                Greeting CustomerName,
-                                                Answer the question with tracking info and delivery time.
-                                                Miss Mary of Sweden` },
-        { role: "system", content:"Answer the question in the same language as the question. if the question is relating to an order, try to find shipping information in the order data." },
-        { role: "system", content: `Order data in JSON: ${customerOrder}` },
+        { role: "user", content: `Context: Please summarize this customer service interaction and suggest a response to the customer's question: ${convo}` },
+        { role: "system", content: "Context: Although we don't have physical stores, we offer a fit guarantee, helpful customer service by phone, and you can shop at Miss Mary's website. Try our products risk-free for 100 days!" },
+        { role: "system", content: `Context: Shipping time: ${shippingTime[cc] || 'Orders usually takes 7-9 working days to arrive'}`},
+        { role: "system", content: `Context: Contact Number for Miss Mary: ${contactNumber[cc] || '+4633222220'}`},
+        { role: "system", content: `Context: Your name is ${name}. You're a friendly and empathetic customer service agent, aged 69, working for Miss Mary of Sweden -a lingerie company known for its extra comfortable bras.` },
+        { role: "system", content:`Context: You are responding to a customer ticket. Begin with a warm greeting, address the customer by name, answer their question, and provide tracking information and delivery time if applicable. End with 'Miss Mary of Sweden.'` },
+        { role: "system", content:"Context: Respond to the question using the same language it was asked in. If the question pertains to an order, look for relevant shipping information in the order data." },
+        { role: "system", content: `Order data: ${customerOrder}` },
     ]
 }
 
@@ -129,10 +158,51 @@ async function getSummary(prompt) {
 
 client.on("pane.activated", async () => {
   client.invoke("resize", { width: "600px", height: "800px" });
-  const email = await getUserEmail();
-  const [customerOrder, cc] = await getOrderLastOrderInfo(email);
-  updateSummary(customerOrder, cc);
+  getTicketSummary();
 });
+
+async function getTicketSummary() {
+  const ticketSummary = await client.get("ticket.customField:custom_field_17187808083218");
+  document.getElementById("reply").innerText = ticketSummary["ticket.customField:custom_field_17187808083218"];
+}
+
+async function refreshAns(){
+  document.getElementById("reply").innerText = "Loading...";
+  document.querySelector('#refreshbtn').disabled = true;
+  document.getElementById('pbtn').style.display = 'none';
+  let ticketId = await client.get("ticket.id");
+  ticketId = ticketId["ticket.id"];
+  let ticketRequesterEmail = await client.get("ticket.requester.email");
+  ticketRequesterEmail = ticketRequesterEmail["ticket.requester.email"];
+  let ticketRequesterName = await client.get("ticket.requester.name");
+  ticketRequesterName = ticketRequesterName["ticket.requester.name"];
+
+  let currentUserEmail = await client.get("currentUser.email");
+  currentUserEmail = currentUserEmail["currentUser.email"];
+  let currentUserName = await client.get("currentUser.name");
+  currentUserName = currentUserName["currentUser.name"];
+  var options = {
+    url: 'https://mm-zendesk-chat.azurewebsites.net:443/api/SuggestedReply/triggers/When_a_HTTP_request_is_received/invoke?api-version=2022-05-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=-f1bnrXhJ6Gpd2zmH28079nuYWz1iFCnRUK_7u64kL4',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      id: ticketId,
+      requester: {
+        name: ticketRequesterName,
+        email: ticketRequesterEmail
+      },
+      currentUser: {
+        name: currentUserName,
+        email: currentUserEmail
+      }
+    })
+  };
+  const response = await client.request(options);
+  getTicketSummary();
+  document.getElementById('pbtn').style.display = 'block';
+  document.querySelector('#refreshbtn').disabled = false;
+  console.log(response,'response from logic app')
+}
 
 
 async function getUserEmail(){
