@@ -156,18 +156,26 @@ async function getSummary(prompt) {
   return response.choices[0].message.content.trim();
 }
 
-client.on("pane.activated", async () => {
+/* client.on("pane.activated", async () => {
   client.invoke("resize", { width: "600px", height: "800px" });
+  getTicketSummary();
+}); */
+
+client.on("app.registered", async () => {
+  client.invoke("resize", { width: "100%", height: "800px" });
   getTicketSummary();
 });
 
 async function getTicketSummary() {
   const ticketSummary = await client.get("ticket.customField:custom_field_17187808083218");
   document.getElementById("reply").innerText = ticketSummary["ticket.customField:custom_field_17187808083218"];
+  const ticketReplyNew = await client.get("ticket.customField:custom_field_19341780814482");
+  document.getElementById("reply_new").innerText = ticketReplyNew["ticket.customField:custom_field_19341780814482"];
 }
 
 async function refreshAns(){
   document.getElementById("reply").innerText = "Loading...";
+  document.getElementById("reply_new").innerText = "Loading...";
   document.querySelector('#refreshbtn').disabled = true;
   document.getElementById('pbtn').style.display = 'none';
   let ticketId = await client.get("ticket.id");
@@ -198,6 +206,7 @@ async function refreshAns(){
     })
   };
   const response = await client.request(options);
+  await new Promise(resolve => setTimeout(resolve, 25000));
   getTicketSummary();
   document.getElementById('pbtn').style.display = 'block';
   document.querySelector('#refreshbtn').disabled = false;

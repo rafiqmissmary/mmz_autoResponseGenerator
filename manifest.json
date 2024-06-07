@@ -8,7 +8,7 @@
   "private": true,
   "location": {
     "support": {
-      "ticket_editor": {
+      "ticket_sidebar": {
         "url": "assets/iframe.html",
         "flexible": true
       }

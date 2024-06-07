@@ -16,7 +16,12 @@
       <i class="fa fa-copy" onclick="navigator.clipboard.writeText($(`#reply`).text())"></i>
     </div>
     <div class="u-mt" id="container">
+      <h4>Old:</h4>
       <div id="reply"></div>
+      <hr>
+      <br>
+      <h4>New:</h4>
+      <div id="reply_new"></div>
       <input type="button" id="pbtn" value="Push Reply" onclick="getTicketReply()">
     </div>
     <input id="btnPostReply" style="display:none" type="button" value ="Paste Reply" onclick="getTicketReply()">
