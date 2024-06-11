@@ -12,19 +12,23 @@
   <body style="padding:15px">
     <h2 class="u-semibold u-fs-xl">Reply suggestion</h2>
     <div style="display: flex;">
-      <input type="button" id="refreshbtn" value="Generate answer" onclick="refreshAns()">
+      <input type="button" id="refreshbtn" value="Generate answer" onclick="updateAndRefresh()">
       <i class="fa fa-copy" onclick="navigator.clipboard.writeText($(`#reply`).text())"></i>
     </div>
     <div class="u-mt" id="container">
       <h4>Old:</h4>
       <div id="reply"></div>
-      <hr>
+      <br><hr>
       <br>
       <h4>New:</h4>
       <div id="reply_new"></div>
       <input type="button" id="pbtn" value="Push Reply" onclick="getTicketReply()">
     </div>
     <input id="btnPostReply" style="display:none" type="button" value ="Paste Reply" onclick="getTicketReply()">
+    <br><br>
+    <hr>
+    <br><br>
+    <input type="button" id="refreshFieldsbtn" value="Refresh Custom fields" onclick="refreshCustomFields()">
     <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
   </body>

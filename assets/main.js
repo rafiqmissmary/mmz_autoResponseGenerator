@@ -82,11 +82,14 @@ async function updateSummary(customerOrder, cc) {
   document.getElementById("btnPostReply").style.display = "block";
 }
 async function getTicketReply(){
-    const reply = document.getElementById("reply");
+    const ticketChannel = await client.get("ticket.via.channel");
+    const reply = document.getElementById("reply_new");
     let text = reply.innerText;
     console.log(text, 'text before');
     //text = text.replace(/<br>/g, '\n\n');
-    text = text.replace(/\n/g, '<br>');
+    if(ticketChannel['ticket.via.channel'] != 'fb_private_message'){
+      text = text.replace(/\n/g, '<br>');
+    }
     console.log(text, 'text');
     client.invoke('comment.appendHtml', text);
     client.invoke('hide');
@@ -206,11 +209,47 @@ async function refreshAns(){
     })
   };
   const response = await client.request(options);
-  await new Promise(resolve => setTimeout(resolve, 25000));
-  getTicketSummary();
+  await new Promise(resolve => setTimeout(resolve, 30000));
   document.getElementById('pbtn').style.display = 'block';
   document.querySelector('#refreshbtn').disabled = false;
   console.log(response,'response from logic app')
+}
+
+async function updateAndRefresh() {
+  await refreshAns();
+  getTicketSummary();
+}
+async function refreshCustomFields(){
+  document.querySelector('#refreshFieldsbtn').disabled = true;
+
+  
+  let ticketRequesterEmail = await client.get("ticket.requester.email");
+  ticketRequesterEmail = ticketRequesterEmail["ticket.requester.email"];
+  
+  var options = {
+    url: 'https://mm-zendesk-chat.azurewebsites.net:443/api/orderinfobyidoremail/triggers/When_a_HTTP_request_is_received/invoke?api-version=2022-05-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=QLPREiVf30bHHlogQjtyH6_l3AfGMztAAVGuTnZTLnE',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      ordernumberoremail: ticketRequesterEmail
+    })
+  };
+  const response = await client.request(options);
+  console.log(response, 'response')
+  await client.set("ticket.customField:custom_field_17644429567122", response.orderNumber);
+  await client.set("ticket.customField:custom_field_17644490468242", response.orderDate);
+  await client.set("ticket.customField:custom_field_17644531581714", response.orderStatus);
+  await client.set("ticket.customField:custom_field_17644519781394", response.msgShippmentCount);
+  await client.set("ticket.customField:custom_field_17644521821970", response.msgTrackingNumber1);
+  await client.set("ticket.customField:custom_field_17644523521554", response.msgTrackingLastStatus1);
+  await client.set("ticket.customField:custom_field_17644556348946", response.msgTrackingNumber2);
+  await client.set("ticket.customField:custom_field_17644521821970", response.msgTrackingLastStatus2);
+
+  await client.set("ticket.customField:custom_field_17667619230226", response.msgShippmentDate1);
+  await client.set("ticket.customField:custom_field_17667620570770", response.msgShippmentDate2);
+
+  document.querySelector('#refreshFieldsbtn').disabled = false;
+
 }
 
 
