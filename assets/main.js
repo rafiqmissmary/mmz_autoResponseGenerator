@@ -159,10 +159,10 @@ async function getSummary(prompt) {
   return response.choices[0].message.content.trim();
 }
 
-/* client.on("pane.activated", async () => {
+client.on("pane.activated", async () => {
   client.invoke("resize", { width: "600px", height: "800px" });
   getTicketSummary();
-}); */
+});
 
 client.on("app.registered", async () => {
   client.invoke("resize", { width: "100%", height: "800px" });
