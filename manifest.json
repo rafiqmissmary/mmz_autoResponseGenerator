@@ -20,24 +20,5 @@
   },
   "version": "1.0.0",
   "frameworkVersion": "2.0",
-  "domainWhitelist": ["api.openai.com", "missmary.centra.com", "asendiatracking.azurewebsites.net"],
-  "parameters": [
-    {
-      "name": "openAiApiToken",
-      "type": "text",
-      "secure": true,
-      "required": true
-    },
-    {
-      "name": "apiToken",
-      "type": "text",
-      "secure": true,
-      "required": true
-    },
-    {
-      "name": "openAiModel",
-      "type": "text",
-      "required": false
-    }
-  ]
+  "domainWhitelist": ["api.openai.com", "missmary.centra.com", "asendiatracking.azurewebsites.net"]
 }

@@ -11,16 +11,13 @@
   </head>
   <body style="padding:15px">
     <h2 class="u-semibold u-fs-xl">Reply suggestion</h2>
+    <br >
     <div style="display: flex;">
-      <input type="button" id="refreshbtn" value="Generate answer" onclick="updateAndRefresh()">
-      <i class="fa fa-copy" onclick="navigator.clipboard.writeText($(`#reply`).text())"></i>
+      <input type="button" id="refreshbtn" value="Generate answer" onclick="updateAndRefresh()">&nbsp;
+      <i class="fa fa-copy" onclick="navigator.clipboard.writeText($(`#reply_new`).text())"></i>
     </div>
     <div class="u-mt" id="container">
-      <h4>Old:</h4>
-      <div id="reply"></div>
-      <br><hr>
       <br>
-      <h4>New:</h4>
       <div id="reply_new"></div>
       <input type="button" id="pbtn" value="Push Reply" onclick="getTicketReply()">
     </div>
